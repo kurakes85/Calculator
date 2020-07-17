@@ -29,26 +29,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void buttonClick(View view) {
-        //버튼을 위로 올렸다
+
         Button getButton = findViewById(view.getId());
-
-        Log.e("buttonClick", "buttonClick 시작" + getButton.getText().toString() + " 버튼이 클릭 되었습니다");
-        Log.d("buttonClick", "defaultNumber = " + resultNumber);
-
-        //스위치문도 한번 만들어 봐요
 
         switch (view.getId()) {
             case R.id.all_clear_button:
                 isFirstInput = true;
                 resultNumber = 0;
                 operator = '+';
-                resultText.setTextColor(0xff666666);
-                resultText.setText(CLEAR_INPUT_TEXT);
+                setClearText("0");
                 break;
 
             case R.id.clear_entry_button:
-                isFirstInput = true;
-                resultText.setText(CLEAR_INPUT_TEXT);
+                setClearText("0");
                 break;
 
             case R.id.back_space_button:
@@ -57,8 +50,7 @@ public class MainActivity extends AppCompatActivity {
                     String subString = getResultText.substring(0,getResultText.length() -1);
                     resultText.setText(subString);
                 } else{
-                    resultText.setText(CLEAR_INPUT_TEXT);
-                    isFirstInput = true;
+                    setClearText("0");
                 }
                 break;
 
@@ -75,17 +67,8 @@ public class MainActivity extends AppCompatActivity {
             case R.id.multiple_button:
 
                 int lastNum = Integer.parseInt(resultText.getText().toString());
-                if (operator == '+') {
-                    resultNumber = resultNumber + lastNum;
-                } else if (operator == '-') {
-                    resultNumber = resultNumber - lastNum;
+                resultNumber = intCal(resultNumber,lastNum,operator);
 
-                } else if (operator == '/') {
-                    resultNumber = resultNumber / lastNum;
-                } else if (operator == '*') {
-                    resultNumber = resultNumber * lastNum;
-                }
-                //오퍼레이터를 charAt으로 바꾸면서 반복 되는 작업을 줄였다.
                 operator = getButton.getText().toString().charAt(0);
                 resultText.setText(String.valueOf(resultNumber));
                 isFirstInput = true;
@@ -95,49 +78,50 @@ public class MainActivity extends AppCompatActivity {
 
                 //결과를 출력하자!
             case R.id.result_button:
-                if (operator == '+') {
-                    resultNumber = resultNumber + Integer.parseInt(resultText.getText().toString());
-                } else if (operator == '-') {
-                    resultNumber = resultNumber + Integer.parseInt(resultText.getText().toString());
-                } else if (operator == '/') {
-                    resultNumber = resultNumber + Integer.parseInt(resultText.getText().toString());
-                } else if (operator == '*') {
-                    resultNumber = resultNumber + Integer.parseInt(resultText.getText().toString());
-                }
+
+                resultNumber = intCal(resultNumber,Integer.parseInt(resultText.getText().toString()),operator);
                 resultText.setText(String.valueOf(resultNumber));
                 isFirstInput = true;
                 Log.d("buttonClick","add resultNumber" + resultNumber);
                 break;
 
-            case R.id.num_0_button:
-            case R.id.num_1_button:
-            case R.id.num_2_button:
-            case R.id.num_3_button:
-            case R.id.num_4_button:
-            case R.id.num_5_button:
-            case R.id.num_6_button:
-            case R.id.num_7_button:
-            case R.id.num_8_button:
-            case R.id.num_9_button:
-
-                if (isFirstInput) {
-                    //숫자의 컬러가 들어가는 부분 12진수로 들어가요
-                    resultText.setTextColor(0xff000000);
-                    resultText.setText(getButton.getText().toString());
-                    isFirstInput = false;
-                } else {
-                    resultText.append(getButton.getText().toString());
-                }
-                break;
-
-            //default 는 case 에서 정의 되지 않는 다른 값이 들어 왔을때 아래의 내용이 실행 되게 한다.
             default:
-                //토스트 버튼 만들어서 동작이 안되는 버튼 확인 하기!
-                //토스트 버튼은 일반 사용자가 볼수 없도록 하는경우가 많다
-                //그래서 LOG 를 사용해서 로그캣 화면에서 볼수 있는 명령어로 바꿔 준다
-                //Toast.makeText(getApplicationContext(), getButton.getText().toString() + "버튼이 클릭 되었습니다", Toast.LENGTH_LONG).show();
                 Log.e("buttonClick", "default" + getButton.getText().toString() + "버튼이 클릭 되었습니다");
                 break;
         }
+    }
+
+    //예외 처리와 중복되는 코드들을 위해 메소드를 만들어 중복을 방지 합시다!
+    public void numButtonClick(View view){
+        Button getButton = findViewById(view.getId());
+
+        if (isFirstInput) {
+            //숫자의 컬러가 들어가는 부분 12진수로 들어가요
+            resultText.setTextColor(0xff000000);
+            resultText.setText(getButton.getText().toString());
+            isFirstInput = false;
+        } else {
+            resultText.append(getButton.getText().toString());
+        }
+    }
+
+    public void setClearText(String clearText){
+        isFirstInput = true;
+        resultText.setTextColor(0xff666666);
+        resultText.setText(clearText);
+    }
+
+    public int intCal(int result, int lastNum, char operator){
+        if (operator == '+') {
+            result += lastNum;
+        } else if (operator == '-') {
+            result -= lastNum;
+        } else if (operator == '/') {
+            result /= lastNum;
+        } else if (operator == '*') {
+            result *= lastNum;
+        }
+
+        return result;
     }
 }
